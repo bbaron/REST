@@ -5,17 +5,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationEvent;
 
-public final class EntityCreated extends ApplicationEvent{
+public final class SingleEntityRetrieved extends ApplicationEvent{
 	private final HttpServletResponse response;
-	private final long idOfNewEntity;
 	private final HttpServletRequest request;
 	
-	public EntityCreated( final Object sourceToSet, final HttpServletRequest requestToSet, final HttpServletResponse responseToSet, final long idOfNewEntityToSet ){
+	public SingleEntityRetrieved( final Object sourceToSet, final HttpServletRequest requestToSet, final HttpServletResponse responseToSet ){
 		super( sourceToSet );
 		
 		this.request = requestToSet;
 		this.response = responseToSet;
-		this.idOfNewEntity = idOfNewEntityToSet;
 	}
 	
 	//
@@ -25,9 +23,6 @@ public final class EntityCreated extends ApplicationEvent{
 	}
 	public final HttpServletResponse getResponse(){
 		return this.response;
-	}
-	public final long getIdOfNewEntity(){
-		return this.idOfNewEntity;
 	}
 	
 }

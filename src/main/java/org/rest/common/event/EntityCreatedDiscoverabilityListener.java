@@ -3,13 +3,14 @@ package org.rest.common.event;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.rest.common.util.RESTURLUtil;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
 @Component
-public final class AddLinkHeaderListener implements ApplicationListener< EntityCreated >{
+final class EntityCreatedDiscoverabilityListener implements ApplicationListener< EntityCreated >{
 	
 	@Override
 	public final void onApplicationEvent( final EntityCreated entityCreatedEvent ){
@@ -22,16 +23,12 @@ public final class AddLinkHeaderListener implements ApplicationListener< EntityC
 		this.addLinkHeaderOnEntityCreation( request, response, idOfNewEntity );
 	}
 	
-	@SuppressWarnings( "unused" )
 	final void addLinkHeaderOnEntityCreation( final HttpServletRequest request, final HttpServletResponse response, final long idOfNewEntity ){
-		final String contextPath = request.getContextPath(); // /rest
-		final String servletPath = request.getServletPath(); // /api
-		final String pathInfo = request.getPathInfo(); // /admin/foo
+		final StringBuffer requestURL = request.getRequestURL();
 		
-		final String requestURI = request.getRequestURI(); // /rest/api/admin/foo
-		final StringBuffer requestURL = request.getRequestURL(); // http://localhost:8080/rest/api/admin/foo
+		final String linkHeaderValue = RESTURLUtil.createLinkHeader( requestURL + "/" + idOfNewEntity, "self" );
 		
-		response.addHeader( "Link", requestURL + "/" + idOfNewEntity );
+		response.addHeader( "Link", linkHeaderValue );
 	}
 	
 }

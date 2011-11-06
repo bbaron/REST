@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.rest.common.event.EntityCreated;
+import org.rest.common.event.SingleEntityRetrieved;
 import org.rest.common.util.RestPreconditions;
 import org.rest.model.Foo;
 import org.rest.service.foo.IFooService;
@@ -46,20 +47,20 @@ final class FooController{
 	
 	@RequestMapping( value = "admin/foo/{id}",method = RequestMethod.GET )
 	@ResponseBody
-	public final Foo get( @PathVariable( "id" ) final Long id ){
-		return RestPreconditions.checkNotNull( this.service.getById( id ) );
+	public final Foo get( @PathVariable( "id" ) final Long id, final HttpServletRequest request, final HttpServletResponse response ){
+		final Foo entityById = RestPreconditions.checkNotNull( this.service.getById( id ) );
+		
+		this.applicationContext.publishEvent( new SingleEntityRetrieved( this, request, response ) );
+		return entityById;
 	}
 	
 	@RequestMapping( value = "admin/foo",method = RequestMethod.POST )
-	@ResponseBody
 	@ResponseStatus( HttpStatus.CREATED )
-	public final Long create( @RequestBody final Foo entity, final HttpServletRequest request, final HttpServletResponse response ){
+	public final void create( @RequestBody final Foo entity, final HttpServletRequest request, final HttpServletResponse response ){
 		RestPreconditions.checkNotNullFromRequest( entity );
 		final Long idOfCreatedResource = this.service.create( entity );
 		
 		this.applicationContext.publishEvent( new EntityCreated( this, request, response, idOfCreatedResource ) );
-		
-		return idOfCreatedResource;
 	}
 	
 	@RequestMapping( value = "admin/foo",method = RequestMethod.PUT )
